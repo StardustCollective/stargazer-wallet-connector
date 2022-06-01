@@ -125,9 +125,9 @@ class StargazerConnector extends AbstractConnector {
 
       if ((e as any).code === 4001) {
         throw new StargazerConnectorUserRejectionError();
-      } else {
-        throw e;
       }
+
+      throw e;
     }
 
     return typeof response === 'object' && response !== null && 'result' in response
@@ -173,7 +173,14 @@ class StargazerConnector extends AbstractConnector {
   }
 
   async getChainProvider(chain: 'ethereum' | 'constellation'): Promise<StargazerEIPProvider> {
-    return chain === 'ethereum' ? this.ethProvider : this.dagProvider;
+    if (chain === 'ethereum') {
+      return this.ethProvider;
+    }
+    if (chain === 'constellation') {
+      return this.dagProvider;
+    }
+
+    throw new StargazerConnectorError('Unsupported chain');
   }
 
   async getChainId(): Promise<string | number> {
@@ -194,6 +201,9 @@ class StargazerConnector extends AbstractConnector {
       this.ethProvider.removeListener('networkChanged', this.onEthNetworkChanged);
       this.ethProvider.removeListener('accountsChanged', this.onEthAccountsChanged);
       this.ethProvider.removeListener('close', this.onEthClose);
+
+      this.dagProvider.removeListener('accountsChanged', this.onDagAccountsChanged);
+      this.dagProvider.removeListener('close', this.onDagClose);
     } catch (e) {
       logger.warn('deactivate:error -> ', e);
     }
