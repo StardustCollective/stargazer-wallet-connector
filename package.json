@@ -1,5 +1,5 @@
 {
-  "name": "stargazer-connector",
+  "name": "@stardust-collective/web3-react-stargazer-connector",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",

@@ -80,11 +80,6 @@ class StargazerConnector extends AbstractConnector {
     }
   }
 
-  private onEthNetworkChanged(networkId: string | number) {
-    logger.debug('onEthNetworkChanged -> ', networkId);
-    this.emitUpdate({chainId: networkId, provider: this.ethProvider});
-  }
-
   private onEthClose() {
     logger.debug('onEthClose');
     this.emitDeactivate();
@@ -140,17 +135,9 @@ class StargazerConnector extends AbstractConnector {
       throw new StargazerConnectorError('StargazerConnector: Providers are not available');
     }
 
-    this.ethProvider.on('chainChanged', this.onEthChainChanged);
-    this.ethProvider.on('networkChanged', this.onEthNetworkChanged);
-    this.ethProvider.on('accountsChanged', this.onEthAccountsChanged);
-    this.ethProvider.on('close', this.onEthClose);
-
-    this.dagProvider.on('accountsChanged', this.onDagAccountsChanged);
-    this.dagProvider.on('close', this.onDagClose);
-
-    let account;
+    let account: string;
     try {
-      const ethAccounts = await this.request({method: 'eth_requestAccounts'});
+      const ethAccounts = await this.request({method: 'eth_accounts'});
       logger.debug('activate:ethAccounts -> ', ethAccounts);
 
       const dagAccounts = await this.request({method: 'dag_accounts'});
@@ -164,6 +151,13 @@ class StargazerConnector extends AbstractConnector {
       logger.error('activate:error -> ', e);
       throw e;
     }
+
+    this.ethProvider.on('chainChanged', this.onEthChainChanged);
+    this.ethProvider.on('accountsChanged', this.onEthAccountsChanged);
+    this.ethProvider.on('disconnect', this.onEthClose);
+
+    this.dagProvider.on('accountsChanged', this.onDagAccountsChanged);
+    this.dagProvider.on('disconnect', this.onDagClose);
 
     return {provider: this.ethProvider, ...(account ? {account} : {})};
   }
@@ -198,12 +192,11 @@ class StargazerConnector extends AbstractConnector {
   deactivate(): void {
     try {
       this.ethProvider.removeListener('chainChanged', this.onEthChainChanged);
-      this.ethProvider.removeListener('networkChanged', this.onEthNetworkChanged);
       this.ethProvider.removeListener('accountsChanged', this.onEthAccountsChanged);
-      this.ethProvider.removeListener('close', this.onEthClose);
+      this.ethProvider.removeListener('disconnect', this.onEthClose);
 
       this.dagProvider.removeListener('accountsChanged', this.onDagAccountsChanged);
-      this.dagProvider.removeListener('close', this.onDagClose);
+      this.dagProvider.removeListener('disconnect', this.onDagClose);
     } catch (e) {
       logger.warn('deactivate:error -> ', e);
     }
