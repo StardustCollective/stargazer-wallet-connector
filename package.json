@@ -1,18 +1,39 @@
 {
   "name": "@stardust-collective/web3-react-stargazer-connector",
-  "version": "1.0.0",
-  "main": "dist/index.js",
+  "version": "1.0.1",
+  "description": "The official web3-react connector for the Stargazer Wallet.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "repository": "https://github.com/StardustCollective/stargazer-wallet-connector",
+  "homepage": "https://github.com/StardustCollective/stargazer-wallet-connector",
   "author": "Stardust Collective <info@stardustcollective.org>",
+  "contributors": [
+    "Juan David Suarez <juansuarezespitia@gmail.com>"
+  ],
   "license": "MIT",
-  "private": true,
+  "private": false,
   "engines": {
     "node": "^16.13.1"
   },
+  "keywords": [
+    "constellation",
+    "crypto",
+    "dag",
+    "stargazer",
+    "wallet",
+    "web3",
+    "ethereum",
+    "react"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "yarn build:esm && yarn build:cjs",
+    "build:esm": "tsc --project ./tsconfig.json && rename 's/\\.js$/.mjs/' dist/esm/*",
+    "build:cjs": "tsc --project ./tsconfig.cjs.json",
     "dev": "tsc --watch"
+  },
+  "bugs": {
+    "url": "https://github.com/StardustCollective/stargazer-wallet-connector/issues"
   },
   "dependencies": {
     "@web3-react/abstract-connector": "^6.0.7",
