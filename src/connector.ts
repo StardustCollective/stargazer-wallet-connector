@@ -161,6 +161,11 @@ class StargazerConnector extends AbstractConnector {
   }
 
   async switchEVMProvider(chain: Chains) {
+    // Check if the evm chain is supported
+    if (!['ethereum', 'bsc', 'polygon', 'avalanche'].includes(chain)) {
+      throw new StargazerConnectorError('Unsupported chain');
+    }
+
     // Deactivate the previous provider -> Remove all listeners
     await this.deactivate();
 
