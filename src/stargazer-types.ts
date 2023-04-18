@@ -4,9 +4,11 @@ type StargazerEIPProvider = {
   removeListener: (method: string, listener: Function) => void;
 };
 
+type Chains = 'ethereum' | 'constellation' | 'polygon' | 'bsc' | 'avalanche';
+
 type StargazerEIPProviderManager = {
   version: string | number;
-  getProvider: (chain: 'ethereum' | 'constellation') => StargazerEIPProvider;
+  getProvider: (chain: Chains) => StargazerEIPProvider;
   isConnected: () => Promise<boolean>;
   enable: () => Promise<string[]>;
 };
@@ -20,4 +22,4 @@ declare global {
   interface Window extends StargazerEIPWindowScope {}
 }
 
-export type {StargazerEIPProvider, StargazerEIPProviderManager, StargazerEIPWindowScope};
+export type {StargazerEIPProvider, StargazerEIPProviderManager, StargazerEIPWindowScope, Chains};
