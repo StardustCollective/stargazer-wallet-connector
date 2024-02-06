@@ -1,2 +1,2 @@
 export * from './errors';
-export * from './connector';
+export * from './connectors/index';
