@@ -6,7 +6,7 @@ import {bindAllMethods} from '../utils';
 import {logger} from '../logger';
 import {StargazerConnectorError, StargazerConnectorUserRejectionError} from '../errors';
 
-class StargazerConnector extends AbstractConnector {
+class StargazerWeb3ReactConnector extends AbstractConnector {
   #activeEVMProvider: StargazerEIPProvider | null;
   #ethProvider: StargazerEIPProvider | null;
   #polygonProvider: StargazerEIPProvider | null;
@@ -306,4 +306,4 @@ class StargazerConnector extends AbstractConnector {
   }
 }
 
-export {StargazerConnector};
+export {StargazerWeb3ReactConnector};
