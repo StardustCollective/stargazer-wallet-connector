@@ -27,7 +27,7 @@
   ],
   "scripts": {
     "build": "yarn build:cjs",
-    "build:cjs": "tsc --project ./tsconfig.json",
+    "build:cjs": "rm -rf ./dist && tsc --project ./tsconfig.json",
     "dev": "tsc --watch"
   },
   "bugs": {
@@ -35,6 +35,11 @@
   },
   "dependencies": {
     "@web3-react/abstract-connector": "^6.0.7",
+    "debug": "^4.3.4"
+  },
+  "peerDependencies": {
+    "viem": "2.7.6",
+    "wagmi": "2.5.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -59,6 +64,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "viem": "2.7.6",
+    "wagmi": "2.5.5"
   }
 }
