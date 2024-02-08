@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-types */
 type StargazerEIPProvider = {
-  request: (request: {method: string; params?: any[]}) => Promise<any>;
+  request: <R = any>(request: {method: string; params?: any[]}) => Promise<R>;
   on: (method: string, listener: Function) => void;
   removeListener: (method: string, listener: Function) => void;
+  activated: boolean;
 };
 
 type Chains = 'ethereum' | 'constellation' | 'polygon' | 'bsc' | 'avalanche';

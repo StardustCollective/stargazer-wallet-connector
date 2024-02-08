@@ -1,12 +1,12 @@
 import {AbstractConnector} from '@web3-react/abstract-connector';
 import {ConnectorUpdate, AbstractConnectorArguments} from '@web3-react/types';
-import {Chains, StargazerEIPProvider} from './stargazer-types';
-import {bindAllMethods} from './utils';
-import {logger} from './logger';
-import {StargazerConnectorError, StargazerConnectorUserRejectionError} from './errors';
 
-class StargazerConnector extends AbstractConnector {
+import {Chains, StargazerEIPProvider} from '../stargazer-types';
+import {bindAllMethods} from '../utils';
+import {logger} from '../logger';
+import {StargazerConnectorError, StargazerConnectorUserRejectionError} from '../errors';
 
+class StargazerWeb3ReactConnector extends AbstractConnector {
   #activeEVMProvider: StargazerEIPProvider | null;
   #ethProvider: StargazerEIPProvider | null;
   #polygonProvider: StargazerEIPProvider | null;
@@ -206,7 +206,14 @@ class StargazerConnector extends AbstractConnector {
   }
 
   async activate(): Promise<ConnectorUpdate> {
-    if (!this.#activeEVMProvider || !this.#ethProvider || !this.#polygonProvider || !this.#bscProvider || !this.#avalancheProvider || !this.#dagProvider) {
+    if (
+      !this.#activeEVMProvider ||
+      !this.#ethProvider ||
+      !this.#polygonProvider ||
+      !this.#bscProvider ||
+      !this.#avalancheProvider ||
+      !this.#dagProvider
+    ) {
       throw new StargazerConnectorError('StargazerConnector: Providers are not available');
     }
 
@@ -245,7 +252,7 @@ class StargazerConnector extends AbstractConnector {
     if (chain === 'ethereum') {
       return this.ethProvider;
     }
-    
+
     if (chain === 'polygon') {
       return this.polygonProvider;
     }
@@ -271,7 +278,7 @@ class StargazerConnector extends AbstractConnector {
 
   async getAccount(): Promise<string | null> {
     try {
-      return (await this.activeEVMProvider.request({method: 'eth_accounts'}))[0];
+      return (await this.activeEVMProvider.request<string[]>({method: 'eth_accounts'}))[0];
     } catch (e) {
       return null;
     }
@@ -292,11 +299,11 @@ class StargazerConnector extends AbstractConnector {
 
   async isAuthorized(): Promise<boolean> {
     try {
-      return (await this.activeEVMProvider.request({method: 'eth_accounts'})).length > 0;
+      return (await this.activeEVMProvider.request<string[]>({method: 'eth_accounts'})).length > 0;
     } catch {
       return false;
     }
   }
 }
 
-export {StargazerConnector};
+export {StargazerWeb3ReactConnector};

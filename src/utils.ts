@@ -25,4 +25,29 @@ const bindAllMethods = (self: any) => {
   return self;
 };
 
-export {bindAllMethods};
+const loggingProxy = <T extends object>(target: T, prefix = ''): T => {
+  return new Proxy(target, {
+    get: (target, property) => {
+      const value = target[property];
+      console.log(`${prefix}#get: ${String(property)}`);
+      if (typeof value === 'function') {
+        return async (...args: any[]) => {
+          console.log(`${prefix}#call: ${String(property)}`, args);
+          // eslint-disable-next-line @typescript-eslint/ban-types
+          const rvalue: Promise<never> | never = (value as Function).call(target, ...args);
+
+          if ('then' in rvalue && typeof rvalue.then === 'function') {
+            rvalue.then((v) => console.log(`${prefix}#response(Async): ${String(property)}`, v));
+          } else {
+            console.log(`${prefix}#response: ${String(property)}`, rvalue);
+          }
+
+          return rvalue;
+        };
+      }
+      return value;
+    }
+  });
+};
+
+export {getAllProperties, bindAllMethods, loggingProxy};
