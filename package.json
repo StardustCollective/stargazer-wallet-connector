@@ -1,6 +1,6 @@
 {
   "name": "@stardust-collective/web3-react-stargazer-connector",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "The official library connectors for the Stargazer Wallet.",
   "main": "dist/cjs/index.js",
   "types": "dist/types/index.d.ts",
@@ -38,8 +38,8 @@
     "debug": "^4.3.4"
   },
   "peerDependencies": {
-    "viem": "2.7.6",
-    "wagmi": "2.5.5",
+    "viem": "^2.7.6",
+    "wagmi": "^2.5.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
