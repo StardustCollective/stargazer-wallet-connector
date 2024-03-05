@@ -1,6 +1,6 @@
 {
   "name": "@stardust-collective/web3-react-stargazer-connector",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "The official library connectors for the Stargazer Wallet.",
   "main": "dist/cjs/index.js",
   "types": "dist/types/index.d.ts",
