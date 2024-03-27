@@ -6,16 +6,16 @@ The official Web 3 connectors ([`web3-react`](https://github.com/NoahZinsmeister
 
 If you're using NPM
 
-`npm install @stardust-collective/web3-react-stardust-collective/web3-react-stargazer-connector`
+`npm install @stardust-collective/web3-react-stargazer-connector`
 
 If you're using Yarn
 
-`yarn add @stardust-collective/web3-react-stardust-collective/web3-react-stargazer-connector`
+`yarn add @stardust-collective/web3-react-stargazer-connector`
 
 ## Example (web3-react / v6)
 
 ```typescript
-import {StargazerWeb3ReactConnector} from 'stardust-collective/web3-react-stargazer-connector';
+import {StargazerWeb3ReactConnector} from '@stardust-collective/web3-react-stargazer-connector';
 import {useWeb3React} from '@web3-react/core';
 
 const stargazerConnector = new StargazerWeb3ReactConnector({
@@ -35,7 +35,7 @@ web3react.activate(stargazerConnector);
 ## Example (wagmi)
 
 ```typescript
-import {stargazerWalletWagmiConnector} from 'stardust-collective/web3-react-stargazer-connector';
+import {stargazerWalletWagmiConnector} from '@stardust-collective/web3-react-stargazer-connector';
 import { mainnet, polygon } from 'wagmi/chains'
 import { createConfig, http, useConnect } from 'wagmi'
 
@@ -77,7 +77,7 @@ for(const connector of connectors){
 ## Example (react-hooks)
 
 ```typescript
-import {useStargazerWallet} from 'stardust-collective/web3-react-stargazer-connector';
+import {useStargazerWallet} from '@stardust-collective/web3-react-stargazer-connector';
 
 type IStargazerWalletHookState = {
   activate: () => Promise<void>;
