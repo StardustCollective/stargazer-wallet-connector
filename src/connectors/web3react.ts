@@ -6,6 +6,11 @@ import {bindAllMethods} from '../utils';
 import {logger} from '../logger';
 import {StargazerConnectorError, StargazerConnectorUserRejectionError} from '../errors';
 
+const warning = (...msgs: string[]) => {
+  console.warn(msgs.join(''));
+  logger.warn(msgs.join(''));
+};
+
 class StargazerWeb3ReactConnector extends AbstractConnector {
   #activeEVMProvider: StargazerEIPProvider | null;
   #ethProvider: StargazerEIPProvider | null;
@@ -79,21 +84,57 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     return this.#ethProvider;
   }
 
+  /**
+   * @deprecated Since version 3.0.0,
+   * please use StargazerWeb3ReactConnector.ethProvider along with the RPC
+   * method wallet_switchEthereumChain to obtain a reference to other network providers.
+   * This property will be removed in an upcoming release.
+   */
   get polygonProvider() {
+    warning(
+      'Use of StargazerWeb3ReactConnector.polygonProvider, StargazerWeb3ReactConnector.bscProvider, ',
+      'StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
+      'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
+      'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
+    );
     if (!this.#polygonProvider) {
       throw new StargazerConnectorError('StargazerConnector: Polygon provider is not available');
     }
     return this.#polygonProvider;
   }
 
+  /**
+   * @deprecated Since version 3.0.0,
+   * please use StargazerWeb3ReactConnector.ethProvider along with the RPC
+   * method wallet_switchEthereumChain to obtain a reference to other network providers.
+   * This property will be removed in an upcoming release.
+   */
   get bscProvider() {
+    warning(
+      'Use of StargazerWeb3ReactConnector.polygonProvider, StargazerWeb3ReactConnector.bscProvider, ',
+      'StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
+      'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
+      'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
+    );
     if (!this.#bscProvider) {
       throw new StargazerConnectorError('StargazerConnector: BSC provider is not available');
     }
     return this.#bscProvider;
   }
 
+  /**
+   * @deprecated Since version 3.0.0,
+   * please use StargazerWeb3ReactConnector.ethProvider along with the RPC
+   * method wallet_switchEthereumChain to obtain a reference to other network providers.
+   * This property will be removed in an upcoming release.
+   */
   get avalancheProvider() {
+    warning(
+      'Use of StargazerWeb3ReactConnector.polygonProvider, StargazerWeb3ReactConnector.bscProvider, ',
+      'StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
+      'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
+      'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
+    );
     if (!this.#avalancheProvider) {
       throw new StargazerConnectorError('StargazerConnector: Avalanche provider is not available');
     }
