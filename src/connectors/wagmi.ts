@@ -27,6 +27,9 @@ function stargazerWalletWagmiConnector(parameters: StargazerWalletWagmiConnector
     async connect({chainId} = {}) {
       try {
         const provider = await this.getProvider();
+
+        await provider.activate();
+
         const accounts = (
           (await provider.request({
             method: 'eth_accounts'

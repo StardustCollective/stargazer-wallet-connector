@@ -219,6 +219,8 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
 
     let account: string;
     try {
+      await this.activeEVMProvider.activate();
+
       const ethAccounts = await this.activeEVMProvider.request({method: 'eth_accounts'});
       logger.debug('activate:ethAccounts -> ', ethAccounts);
 

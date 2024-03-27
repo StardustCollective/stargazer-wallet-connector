@@ -44,6 +44,8 @@ const useStargazerWallet = () => {
       const provider = window.stargazer.getProvider('constellation');
 
       try {
+        await provider.activate();
+
         const dagAccounts: string[] = await provider.request({
           method: 'dag_accounts'
         });
