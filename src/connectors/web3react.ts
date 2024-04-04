@@ -168,7 +168,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
 
   private onChainChanged(chainId: string | number) {
     logger.debug('onChainChanged -> ', chainId);
-    this.emitUpdate({chainId, provider: this.activeEVMProvider});
+    this.emitUpdate({chainId, provider: this.ethProvider});
   }
 
   private onAccountsChanged(accounts: string[]) {
@@ -179,7 +179,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     if (this.#ethAccounts.length === 0 && this.#dagAccounts.length === 0) {
       this.emitDeactivate();
     } else {
-      this.emitUpdate({account: accounts[0], provider: this.activeEVMProvider});
+      this.emitUpdate({account: accounts[0], provider: this.ethProvider});
     }
   }
 
@@ -188,8 +188,15 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     this.emitDeactivate();
   }
 
-  private emitDagUpdate(update: {account: string}): void {
+  private emitDagUpdate(
+    update: {account: string} | {chainId: string | number; provider: StargazerEIPProvider}
+  ): void {
     this.emit('ConstellationUpdate', update);
+  }
+
+  private onDagChainChanged(chainId: string | number) {
+    logger.debug('onDagChainChanged -> ', chainId);
+    this.emitDagUpdate({chainId, provider: this.dagProvider});
   }
 
   private onDagAccountsChanged(accounts: string[]) {
@@ -300,6 +307,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     this.ethProvider.on('accountsChanged', this.onAccountsChanged);
     this.ethProvider.on('disconnect', this.onClose);
 
+    this.dagProvider.on('chainChanged', this.onDagChainChanged);
     this.dagProvider.on('accountsChanged', this.onDagAccountsChanged);
     this.dagProvider.on('disconnect', this.onDagClose);
 
@@ -352,6 +360,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
       this.ethProvider.removeListener('accountsChanged', this.onAccountsChanged);
       this.ethProvider.removeListener('disconnect', this.onClose);
 
+      this.dagProvider.removeListener('chainChanged', this.onDagChainChanged);
       this.dagProvider.removeListener('accountsChanged', this.onDagAccountsChanged);
       this.dagProvider.removeListener('disconnect', this.onDagClose);
     } catch (e) {
