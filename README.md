@@ -12,28 +12,72 @@ If you're using Yarn
 
 `yarn add @stardust-collective/web3-react-stargazer-connector`
 
-## Example (web3-react)
+## Example (web3-react / v6)
 
 ```typescript
-import {StargazerWeb3ReactConnector} from 'stargazer-connector';
+import {StargazerWeb3ReactConnector} from '@stardust-collective/web3-react-stargazer-connector';
+import {useWeb3React} from '@web3-react/core';
 
 const stargazerConnector = new StargazerWeb3ReactConnector({
   supportedChainIds: [1, 3]
 });
+
+const web3react = useWeb3React();
+
+/**
+ * Activation
+ * https://github.com/Uniswap/web3-react/blob/v6/docs/README.md
+ */
+
+web3react.activate(stargazerConnector);
 ```
 
 ## Example (wagmi)
 
 ```typescript
-import {StargazerConnector} from 'stargazer-connector';
+import {stargazerWalletWagmiConnector} from '@stardust-collective/web3-react-stargazer-connector';
+import { mainnet, polygon } from 'wagmi/chains'
+import { createConfig, http, useConnect } from 'wagmi'
 
 const stargazerConnector = stargazerWalletWagmiConnector();
+
+declare module 'wagmi' {
+  interface Register {
+    config: typeof config
+  }
+}
+
+const config = createConfig({
+  chains: [mainnet, polygon],
+  transports: {
+    [mainnet.id]: http('[your rpc endpoint url]'),
+    [polygon.id]: http('[your rpc endpoint url]'),
+  },
+  connectors: [
+    stargazerWalletWagmiConnector({}),
+    ...other wallet connectors
+  ],
+})
+
+/**
+ * Activation
+ * https://wagmi.sh/react/guides/connect-wallet#_3-display-wallet-options
+ */
+
+const { connectors, connect } = useConnect()
+
+for(const connector of connectors){
+  if(connector.type === stargazerWalletWagmiConnector.type){
+    connect({ connector })
+  }
+}
+
 ```
 
 ## Example (react-hooks)
 
 ```typescript
-import {useStargazerWallet} from 'stargazer-connector';
+import {useStargazerWallet} from '@stardust-collective/web3-react-stargazer-connector';
 
 type IStargazerWalletHookState = {
   activate: () => Promise<void>;
@@ -65,10 +109,10 @@ await deactivate();
 /*
  * Contains information about the current connected wallet,
  * and exposes a EIP-1193 provider to interact with the wallet
- * 
+ *
  * More info about the RPC EIP-1193 API:
  * https://docs.constellationnetwork.io/stargazer/APIReference/constellationRPCAPI/
- */ 
+ */
 state;
 ```
 

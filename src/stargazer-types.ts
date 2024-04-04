@@ -4,6 +4,7 @@ type StargazerEIPProvider = {
   on: (method: string, listener: Function) => void;
   removeListener: (method: string, listener: Function) => void;
   activated: boolean;
+  activate: (title?: string) => Promise<void>;
 };
 
 type Chains = 'ethereum' | 'constellation' | 'polygon' | 'bsc' | 'avalanche';
