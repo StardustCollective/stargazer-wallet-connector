@@ -18,6 +18,14 @@ type IStargazerWalletHookState = {
 const useStargazerWallet = () => {
   const [provider, setProvider] = useState<StargazerEIPProvider | null>(null);
   const [dagAccounts, setDagAccounts] = useState<string[] | null>(null);
+  const [dagChainId, setDagChainId] = useState<number | null>(null);
+
+  const onDagChainChanged = useCallback(
+    (chainId: string | number) => {
+      setDagChainId(typeof chainId === 'string' ? parseInt(chainId, 16) : chainId);
+    },
+    [provider]
+  );
 
   const onDagAccountsChanged = useCallback(
     (accounts: string[]) => {
@@ -46,15 +54,23 @@ const useStargazerWallet = () => {
       try {
         await provider.activate();
 
+        const chainId: string | number = await provider.request({
+          method: 'dag_chainId'
+        });
+
         const dagAccounts: string[] = await provider.request({
           method: 'dag_accounts'
         });
+
         if (dagAccounts.length === 0) {
           throw new Error('Unable to activate stargazer wallet for constellation network');
         }
+
+        provider.on('chainChanged', onDagChainChanged);
         provider.on('accountsChanged', onDagAccountsChanged);
         provider.on('disconnect', onDagClose);
 
+        onDagChainChanged(chainId);
         onDagAccountsChanged(dagAccounts);
         setProvider(provider);
       } catch (e) {
@@ -66,6 +82,8 @@ const useStargazerWallet = () => {
       if (!provider) {
         return;
       }
+
+      provider.removeListener('chainChanged', onDagChainChanged);
       provider.removeListener('accountsChanged', onDagAccountsChanged);
       provider.removeListener('disconnect', onDagClose);
       onDagClose();
@@ -75,6 +93,7 @@ const useStargazerWallet = () => {
           active: true,
           account: dagAccounts[0],
           provider: provider,
+          chainId: dagChainId,
           request: provider.request
         }
       : {active: false})
