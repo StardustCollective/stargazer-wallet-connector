@@ -40,9 +40,9 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
       typeof window.stargazer.getProvider === 'function'
     ) {
       this.#ethProvider = window.stargazer.getProvider('ethereum');
-      this.#polygonProvider = window.stargazer.getProvider('polygon');
-      this.#bscProvider = window.stargazer.getProvider('bsc');
-      this.#avalancheProvider = window.stargazer.getProvider('avalanche');
+      this.#polygonProvider = window.stargazer.getProvider('ethereum');
+      this.#bscProvider = window.stargazer.getProvider('ethereum');
+      this.#avalancheProvider = window.stargazer.getProvider('ethereum');
       this.#dagProvider = window.stargazer.getProvider('constellation');
 
       // Initialize the active provider with the Ethereum provider
@@ -70,7 +70,18 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     }
   }
 
+  /**
+   * @deprecated Since version 3.0.0,
+   * please use StargazerWeb3ReactConnector.ethProvider along with the RPC
+   * method wallet_switchEthereumChain to obtain a reference to other network providers.
+   * This property will be removed in an upcoming release.
+   */
   get activeEVMProvider() {
+    warning(
+      'Use of StargazerWeb3ReactConnector.activeEVMProvider is deprecated please use ',
+      'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
+      'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
+    );
     if (!this.#activeEVMProvider) {
       throw new StargazerConnectorError('StargazerConnector: Active EVM provider is not available');
     }
@@ -92,8 +103,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
    */
   get polygonProvider() {
     warning(
-      'Use of StargazerWeb3ReactConnector.polygonProvider, StargazerWeb3ReactConnector.bscProvider, ',
-      'StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
+      'Use of StargazerWeb3ReactConnector.polygonProvider is deprecated please use ',
       'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
       'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
     );
@@ -111,8 +121,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
    */
   get bscProvider() {
     warning(
-      'Use of StargazerWeb3ReactConnector.polygonProvider, StargazerWeb3ReactConnector.bscProvider, ',
-      'StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
+      'Use of StargazerWeb3ReactConnector.bscProvider is deprecated please use ',
       'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
       'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
     );
@@ -130,8 +139,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
    */
   get avalancheProvider() {
     warning(
-      'Use of StargazerWeb3ReactConnector.polygonProvider, StargazerWeb3ReactConnector.bscProvider, ',
-      'StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
+      'Use of StargazerWeb3ReactConnector.avalancheProvider is deprecated please use ',
       'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
       'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
     );
@@ -201,7 +209,18 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     this.emitDeactivate();
   }
 
+  /**
+   * @deprecated Since version 3.0.0,
+   * please use StargazerWeb3ReactConnector.ethProvider along with the RPC
+   * method wallet_switchEthereumChain to obtain a reference to other network providers.
+   * This property will be removed in an upcoming release.
+   */
   async switchEVMProvider(chain: Chains) {
+    warning(
+      'Use of StargazerWeb3ReactConnector.switchEVMProvider() is deprecated please use ',
+      'StargazerWeb3ReactConnector.ethProvider along with the RPC method wallet_switchEthereumChain ',
+      'to obtain a reference to other network providers. This property will be removed in an upcoming release.'
+    );
     // Check if the evm chain is supported
     if (!['ethereum', 'bsc', 'polygon', 'avalanche'].includes(chain)) {
       throw new StargazerConnectorError('Unsupported chain');
@@ -229,7 +248,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
       if (request.method.startsWith('dag_')) {
         response = await this.dagProvider.request(request);
       } else {
-        response = await this.activeEVMProvider.request(request);
+        response = await this.ethProvider.request(request);
       }
     } catch (e) {
       logger.error('request:error -> ', e);
@@ -260,9 +279,9 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
 
     let account: string;
     try {
-      await this.activeEVMProvider.activate();
+      await this.ethProvider.activate();
 
-      const ethAccounts = await this.activeEVMProvider.request({method: 'eth_accounts'});
+      const ethAccounts = await this.ethProvider.request({method: 'eth_accounts'});
       logger.debug('activate:ethAccounts -> ', ethAccounts);
 
       const dagAccounts = await this.dagProvider.request({method: 'dag_accounts'});
@@ -277,18 +296,18 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
       throw e;
     }
 
-    this.activeEVMProvider.on('chainChanged', this.onChainChanged);
-    this.activeEVMProvider.on('accountsChanged', this.onAccountsChanged);
-    this.activeEVMProvider.on('disconnect', this.onClose);
+    this.ethProvider.on('chainChanged', this.onChainChanged);
+    this.ethProvider.on('accountsChanged', this.onAccountsChanged);
+    this.ethProvider.on('disconnect', this.onClose);
 
     this.dagProvider.on('accountsChanged', this.onDagAccountsChanged);
     this.dagProvider.on('disconnect', this.onDagClose);
 
-    return {provider: this.activeEVMProvider, ...(account ? {account} : {})};
+    return {provider: this.ethProvider, ...(account ? {account} : {})};
   }
 
   async getProvider(): Promise<StargazerEIPProvider> {
-    return this.activeEVMProvider;
+    return this.ethProvider;
   }
 
   async getChainProvider(chain: Chains): Promise<StargazerEIPProvider> {
@@ -316,12 +335,12 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
   }
 
   async getChainId(): Promise<string | number> {
-    return await this.activeEVMProvider.request({method: 'eth_chainId'});
+    return await this.ethProvider.request({method: 'eth_chainId'});
   }
 
   async getAccount(): Promise<string | null> {
     try {
-      return (await this.activeEVMProvider.request<string[]>({method: 'eth_accounts'}))[0];
+      return (await this.ethProvider.request<string[]>({method: 'eth_accounts'}))[0];
     } catch (e) {
       return null;
     }
@@ -329,9 +348,9 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
 
   deactivate(): void {
     try {
-      this.activeEVMProvider.removeListener('chainChanged', this.onChainChanged);
-      this.activeEVMProvider.removeListener('accountsChanged', this.onAccountsChanged);
-      this.activeEVMProvider.removeListener('disconnect', this.onClose);
+      this.ethProvider.removeListener('chainChanged', this.onChainChanged);
+      this.ethProvider.removeListener('accountsChanged', this.onAccountsChanged);
+      this.ethProvider.removeListener('disconnect', this.onClose);
 
       this.dagProvider.removeListener('accountsChanged', this.onDagAccountsChanged);
       this.dagProvider.removeListener('disconnect', this.onDagClose);
@@ -342,7 +361,7 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
 
   async isAuthorized(): Promise<boolean> {
     try {
-      return (await this.activeEVMProvider.request<string[]>({method: 'eth_accounts'})).length > 0;
+      return (await this.ethProvider.request<string[]>({method: 'eth_accounts'})).length > 0;
     } catch {
       return false;
     }
