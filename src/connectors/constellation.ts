@@ -10,6 +10,7 @@ type IStargazerWalletHookState = {
       active: true;
       account: string;
       provider: StargazerEIPProvider;
+      chainId: number;
       request: StargazerEIPProvider['request'];
     }
   | {active: false}
@@ -88,7 +89,7 @@ const useStargazerWallet = () => {
       provider.removeListener('disconnect', onDagClose);
       onDagClose();
     },
-    ...(dagAccounts && provider
+    ...(dagAccounts && provider && dagChainId
       ? {
           active: true,
           account: dagAccounts[0],
