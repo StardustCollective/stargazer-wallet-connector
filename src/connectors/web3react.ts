@@ -33,41 +33,6 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     this.#dagProvider = null;
     this.#ethAccounts = [];
     this.#dagAccounts = [];
-
-    if (
-      window.stargazer &&
-      'getProvider' in window.stargazer &&
-      typeof window.stargazer.getProvider === 'function'
-    ) {
-      this.#ethProvider = window.stargazer.getProvider('ethereum');
-      this.#polygonProvider = window.stargazer.getProvider('ethereum');
-      this.#bscProvider = window.stargazer.getProvider('ethereum');
-      this.#avalancheProvider = window.stargazer.getProvider('ethereum');
-      this.#dagProvider = window.stargazer.getProvider('constellation');
-
-      // Initialize the active provider with the Ethereum provider
-      this.#activeEVMProvider = this.#ethProvider;
-    }
-
-    if (this.#ethProvider === null) {
-      logger.warn('Ethereum provider is not available');
-    }
-
-    if (this.#polygonProvider === null) {
-      logger.warn('Polygon provider is not available');
-    }
-
-    if (this.#bscProvider === null) {
-      logger.warn('BSC provider is not available');
-    }
-
-    if (this.#avalancheProvider === null) {
-      logger.warn('Avalanche provider is not available');
-    }
-
-    if (this.#dagProvider === null) {
-      logger.warn('Constellation provider is not available');
-    }
   }
 
   /**
@@ -248,7 +213,29 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
     this.onChainChanged(chainId);
   }
 
+  private initializeProviders() {
+    if (
+      window.stargazer &&
+      'getProvider' in window.stargazer &&
+      typeof window.stargazer.getProvider === 'function'
+    ) {
+      if (!this.#ethProvider && !this.#dagProvider) {
+        this.#ethProvider = window.stargazer.getProvider('ethereum');
+        this.#polygonProvider = window.stargazer.getProvider('ethereum');
+        this.#bscProvider = window.stargazer.getProvider('ethereum');
+        this.#avalancheProvider = window.stargazer.getProvider('ethereum');
+        this.#dagProvider = window.stargazer.getProvider('constellation');
+
+        // Initialize the active provider with the Ethereum provider
+        this.#activeEVMProvider = this.#ethProvider;
+      }
+    } else {
+      throw new StargazerConnectorError('StargazerConnector: Providers are not available');
+    }
+  }
+
   async request(request: Parameters<StargazerEIPProvider['request']>[0]): Promise<any> {
+    this.initializeProviders();
     let response: any;
 
     try {
@@ -273,18 +260,9 @@ class StargazerWeb3ReactConnector extends AbstractConnector {
   }
 
   async activate(): Promise<ConnectorUpdate> {
-    if (
-      !this.#activeEVMProvider ||
-      !this.#ethProvider ||
-      !this.#polygonProvider ||
-      !this.#bscProvider ||
-      !this.#avalancheProvider ||
-      !this.#dagProvider
-    ) {
-      throw new StargazerConnectorError('StargazerConnector: Providers are not available');
-    }
-
+    this.initializeProviders();
     let account: string;
+
     try {
       await this.ethProvider.activate();
 
